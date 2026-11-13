@@ -1,0 +1,1979 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Trophy, Users, Calendar, Award, Shield, Plus, Trash2,
+  Lock, Unlock, LogOut, Activity, ChevronRight, ChevronLeft,
+  Search, Palette, Globe, Code, Sun, Moon,
+  UserPlus, Smartphone, X, ArrowUp, ArrowDown, RefreshCw
+} from 'lucide-react';
+
+// ==========================================
+// 1. TRANSLATIONS (ARABIC RTL & ENGLISH LTR)
+// ==========================================
+const TRANSLATIONS = {
+  ar: {
+    schoolName: 'مدرسة المتفوقين في العلوم والتكنولوجيا بالبحيرة',
+    appTitle: 'بوابة الأنشطة الرياضية والتربية البدنية - STEM Behera',
+    dashboard: 'الرئيسية',
+    allMatches: 'جميع المباريات',
+    studentsDb: 'قاعدة بيانات الطلاب',
+    adminLogin: 'دخول الأدمن',
+    adminActive: 'وضع الأدمن مفعل',
+    logout: 'خروج',
+    passwordPrompt: 'أدخل الرقم السري للمسؤول (Admin PIN)',
+    loginBtn: 'تسجيل الدخول',
+    cancelBtn: 'إلغاء',
+    wrongPassword: 'الرقم السري غير صحيح!',
+    customizeUi: 'تخصيص المظهر',
+    pwaSetup: 'تثبيت التطبيق والأكواد',
+    seedData: 'تصفير جميع النتائج (0-0)',
+    football: 'كرة القدم',
+    volleyball: 'الكرة الطائرة',
+    table_tennis: 'تنس الطاولة',
+    chess: 'الشطرنج',
+    teams: 'الفرق والمجموعات',
+    matches: 'المباريات',
+    results: 'النتائج الرسمية',
+    standings: 'جدول الترتيب',
+    stats: 'الهدافين والانضباط',
+    rules: 'القوانين واللوائح',
+    upcoming: 'لم تلعب بعد',
+    live: 'مباشر الآن',
+    completed: 'انتهت',
+    addTeam: 'إضافة فريق جديد',
+    addMatch: 'إضافة مباراة',
+    addStudent: 'إضافة طالب/لاعب',
+    playerName: 'اسم اللاعب رباعي',
+    gender: 'النوع',
+    male: 'بنين',
+    female: 'بنات',
+    grade: 'الصف الدراسي',
+    grade10: 'الصف الأول الثانوي (G10)',
+    grade11: 'الصف الثاني الثانوي (G11)',
+    grade12: 'الصف الثالث الثانوي (G12)',
+    teamName: 'الفريق',
+    teamLogo: 'الشعار',
+    groupName: 'المجموعة',
+    allGroups: 'كل المجموعات',
+    groupA: 'المجموعة الأولى',
+    groupB: 'المجموعة الثانية',
+    groupC: 'المجموعة الثالثة',
+    groupD: 'المجموعة الرابعة',
+    week1: 'الأسبوع الأول',
+    week2: 'الأسبوع الثاني',
+    week3: 'الأسبوع الثالث',
+    allWeeks: 'كل الأسابيع',
+    selectTeam: 'اختر الفريق',
+    homeTeam: 'الفريق الأول',
+    awayTeam: 'الفريق الثاني',
+    matchDate: 'الجولة / الموعد',
+    venue: 'الملعب',
+    status: 'الحالة',
+    played: 'لعب',
+    won: 'فوز',
+    drawn: 'تعادل',
+    lost: 'هزيمة',
+    gf: 'له',
+    ga: 'عليه',
+    gd: 'فرق',
+    points: 'النقاط',
+    goals: 'الأهداف',
+    yellowCards: 'إنذارات صفراء',
+    redCards: 'طرد أحمر',
+    save: 'حفظ',
+    delete: 'حذف',
+    searchPlaceholder: 'ابحث عن فريق أو مباراة...',
+    noData: 'لا توجد بيانات مسجلة',
+    themeColor: 'اللون الرئيسي',
+    darkMode: 'الوضع الليلي / النهاري',
+    gridCols: 'طريقة العرض',
+    sportOrder: 'ترتيب الرياضات',
+  },
+  en: {
+    schoolName: 'STEM Behera High School for Science & Technology',
+    appTitle: 'STEM Behera Sports & P.E. Hub',
+    dashboard: 'Dashboard',
+    allMatches: 'All Matches',
+    studentsDb: 'Student Database',
+    adminLogin: 'Admin Login',
+    adminActive: 'Admin Mode Active',
+    logout: 'Logout',
+    passwordPrompt: 'Enter Confidential Admin Passcode',
+    loginBtn: 'Unlock Admin Panel',
+    cancelBtn: 'Cancel',
+    wrongPassword: 'Invalid Admin Passcode!',
+    customizeUi: 'Customize UI',
+    pwaSetup: 'PWA & Source Files',
+    seedData: 'Reset All Scores to 0-0',
+    football: 'Football',
+    volleyball: 'Volleyball',
+    table_tennis: 'Table Tennis',
+    chess: 'Chess',
+    teams: 'Teams & Groups',
+    matches: 'Fixtures',
+    results: 'Official Results',
+    standings: 'Group Standings',
+    stats: 'Scorers & Discipline',
+    rules: 'Tournament Rules',
+    upcoming: 'Upcoming',
+    live: 'LIVE',
+    completed: 'Completed',
+    addTeam: 'Add New Team',
+    addMatch: 'Schedule Match',
+    addStudent: 'Add Student Athlete',
+    playerName: 'Student Full Name',
+    gender: 'Gender',
+    male: 'Male (بنين)',
+    female: 'Female (بنات)',
+    grade: 'Grade / Year',
+    grade10: 'Grade 10 (الصف الأول)',
+    grade11: 'Grade 11 (الصف الثاني)',
+    grade12: 'Grade 12 (الصف الثالث)',
+    teamName: 'Team',
+    teamLogo: 'Logo',
+    groupName: 'Group',
+    allGroups: 'All Groups',
+    groupA: 'Group 1 (المجموعة الأولى)',
+    groupB: 'Group 2 (المجموعة الثانية)',
+    groupC: 'Group 3 (المجموعة الثالثة)',
+    groupD: 'Group 4 (المجموعة الرابعة)',
+    week1: 'Week 1',
+    week2: 'Week 2',
+    week3: 'Week 3',
+    allWeeks: 'All Weeks',
+    selectTeam: 'Select Team',
+    homeTeam: 'Home Team',
+    awayTeam: 'Away Team',
+    matchDate: 'Round / Date',
+    venue: 'Venue',
+    status: 'Status',
+    played: 'P',
+    won: 'W',
+    drawn: 'D',
+    lost: 'L',
+    gf: 'GF',
+    ga: 'GA',
+    gd: 'GD',
+    points: 'PTS',
+    goals: 'Goals',
+    yellowCards: 'Yellow Cards',
+    redCards: 'Red Cards',
+    save: 'Save Changes',
+    delete: 'Delete',
+    searchPlaceholder: 'Search teams or fixtures...',
+    noData: 'No records available',
+    themeColor: 'Primary Accent Theme',
+    darkMode: 'Dark / Light Mode',
+    gridCols: 'Grid Layout',
+    sportOrder: 'Sports Display Order',
+  }
+};
+
+const INITIAL_UI_CONFIG = {
+  theme: 'emerald',
+  darkMode: true,
+  gridCols: 4,
+  sportOrder: ['football', 'volleyball', 'table_tennis', 'chess'],
+  announcementAr: '⚽ انطلاق دوري كرة القدم بمدرسة STEM Behera — اختر اللاعب مباشرة من قائمة الفريق عند تسجيل الأهداف!',
+  announcementEn: '⚽ STEM Behera Football League — Select players directly from team rosters when logging goals!',
+  sportCovers: {
+    football: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+    volleyball: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=800&q=80',
+    table_tennis: 'https://images.unsplash.com/photo-1534158914592-062992fbe900?auto=format&fit=crop&w=800&q=80',
+    chess: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=800&q=80'
+  },
+  rules: {
+    football: '1. عدد اللاعبين: 4 لاعبين (3 لاعبين + حارس مرمى).\n2. مدة المباراة: 20 دقيقة (شوطين، مدة الشوط 10 دقائق).\n3. نظام النقاط: الفائز 3 نقاط، التعادل نقطة، الخاسر 0 نقاط.',
+    volleyball: '1. تقام المباراة من 3 أشواط، كل شوط من 25 نقطة.',
+    table_tennis: '1. المباريات الإقصائية من 3 أشواط (كل شوط 11 نقطة).',
+    chess: '1. زمن التفكير 10 دقائق لكل لاعب + 5 ثوانٍ إضافية.'
+  }
+};
+
+const INITIAL_TEAMS = [
+  { id: 'g1_t1', name: 'العتاولة', sport: 'football', group: 'groupA', logo: '🛡️', captain: 'أدهم محمد محمد', gk: 'تيم رامي الحسيني', players: ['عبدالرحمن علاء عبدالرحمن', 'ياسين عمرو ابراهيم', 'محمد وسام عبدالرحمن'] },
+  { id: 'g1_t2', name: 'Real Madrid', sport: 'football', group: 'groupA', logo: '👑', captain: 'محمد طلعت عراقي', gk: 'أدهم مأمون شعبان', players: ['معاذ محمد ربيع', 'مصطفى محمد مصطفى', 'أحمد محمد عبدالسلام'] },
+  { id: 'g1_t3', name: 'Trabzon', sport: 'football', group: 'groupA', logo: '🌊', captain: 'يس عبدالله خيري', gk: 'أحمد صبري عبدالرحمن', players: ['محمد ضياء مصطفى', 'عبدالرحمن أحمد أنور', 'مصطفى اسماعيل رجب'] },
+  { id: 'g1_t4', name: 'أرسنال', sport: 'football', group: 'groupA', logo: '🔴', captain: 'طارق أحمد', gk: 'إياد محمد إبراهيم', players: ['عمر الفولي', 'عبدالرحمن صابر', 'مصطفى رياض'] },
+  { id: 'g1_t5', name: 'إيطاليا', sport: 'football', group: 'groupA', logo: '🇮🇹', captain: 'أحمد سلطان', gk: 'زياد سامح', players: ['بلال هندي', 'إبراهيم كلاف', 'معتز'] },
+
+  { id: 'g2_t1', name: 'Phantom', sport: 'football', group: 'groupB', logo: '👻', captain: 'محمد سيد سعيد', gk: 'عبدالله السيد توفيق', players: ['حمزة عادل عبدالنبي', 'مروان محمد جبريل', 'مازن سامح محمود', 'كاراس ندهي سدراك'] },
+  { id: 'g2_t2', name: 'The Legends', sport: 'football', group: 'groupB', logo: '⚡', captain: 'أحمد محمد عبدالنبي', gk: 'أحمد حسين رفعت', players: ['أحمد عمرو أحمد', 'عمر عاطف السيد', 'أحمد عادل علي'] },
+  { id: 'g2_t3', name: 'الأهلي', sport: 'football', group: 'groupB', logo: '🦅', captain: 'محمود محمد محمود', gk: 'أحمد حمدي عبدالرحيم', players: ['عمر محمد فتحي', 'مازن محمد عباس', 'محمد طاهر رشاد', 'عمر أحمد السيد'] },
+  { id: 'g2_t4', name: 'Alpha', sport: 'football', group: 'groupB', logo: '🔥', captain: 'محمد أحمد محمد', gk: 'يحيى يامن عبدالرحيم', players: ['علي أحمد علي', 'عمر محمد أيوب', 'إبراهيم أسامة إبراهيم', 'علي علاء علي'] },
+
+  { id: 'g3_t1', name: 'العاصفة', sport: 'football', group: 'groupC', logo: '🌪️', captain: 'خالد ربيع شعبان', gk: 'مصطفى عبدالعظيم محمود', players: ['إياد سامح محمد', 'هادي هاني', 'علاء سعيد شعبان'] },
+  { id: 'g3_t2', name: 'Fenerbahce', sport: 'football', group: 'groupC', logo: '🟡', captain: 'إياد محمد علي', gk: 'عبدالرحمن هيثم إبراهيم', players: ['عبدالله محمد عبدالله', 'ياسين طه جابر', 'مجدي مجدي محمد'] },
+  { id: 'g3_t3', name: 'السامبا', sport: 'football', group: 'groupC', logo: '🇧🇷', captain: 'جيوفاني', gk: 'إياد البنا', players: ['محمد هيثم', 'علي أحمد علي', 'إبراهيم عبده'] },
+  { id: 'g3_t4', name: 'الفراعنة', sport: 'football', group: 'groupC', logo: '🏺', captain: 'محمد أبو الحسن', gk: 'سعيد', players: ['مروان عطا الله', 'محمد صالح', 'محمد عباس'] },
+
+  { id: 'g4_t1', name: 'برشلونة', sport: 'football', group: 'groupD', logo: '🔵', captain: 'إياد محمود', gk: 'آسر عماد', players: ['أنس همام', 'محمد أشرف', 'عادل الفولي'] },
+  { id: 'g4_t2', name: 'Liverpool', sport: 'football', group: 'groupD', logo: '🔴', captain: 'محمد سامي', gk: 'عبدالله الخولي', players: ['محمد عوض', 'محمود أحمد'] },
+  { id: 'g4_t3', name: 'Stars', sport: 'football', group: 'groupD', logo: '⭐', captain: 'عمر خلف', gk: 'عبدالرحمن عماد', players: ['معاذ', 'ياسين محمد فتحي', 'يوسف جابر'] },
+  { id: 'g4_t4', name: 'الزمالك', sport: 'football', group: 'groupD', logo: '🏹', captain: 'محمود السنطاوي', gk: 'عمر محسن', players: ['محمد زغلول', 'محمد الخولي', 'محمد الأنصاري'] },
+];
+
+const INITIAL_MATCHES = [
+  // المجموعة الأولى
+  { id: 'm1', sport: 'football', group: 'groupA', homeTeamId: 'g1_t4', awayTeamId: 'g1_t3', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 1', venue: 'المجموعة الأولى' },
+  { id: 'm2', sport: 'football', group: 'groupA', homeTeamId: 'g1_t5', awayTeamId: 'g1_t2', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 1', venue: 'المجموعة الأولى' },
+  { id: 'm3', sport: 'football', group: 'groupA', homeTeamId: 'g1_t4', awayTeamId: 'g1_t1', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 2', venue: 'المجموعة الأولى' },
+  { id: 'm4', sport: 'football', group: 'groupA', homeTeamId: 'g1_t5', awayTeamId: 'g1_t3', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 2', venue: 'المجموعة الأولى' },
+  { id: 'm5', sport: 'football', group: 'groupA', homeTeamId: 'g1_t1', awayTeamId: 'g1_t2', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 3', venue: 'المجموعة الأولى' },
+  { id: 'm6', sport: 'football', group: 'groupA', homeTeamId: 'g1_t5', awayTeamId: 'g1_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 3', venue: 'المجموعة الأولى' },
+  { id: 'm7', sport: 'football', group: 'groupA', homeTeamId: 'g1_t5', awayTeamId: 'g1_t1', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 4', venue: 'المجموعة الأولى' },
+  { id: 'm8', sport: 'football', group: 'groupA', homeTeamId: 'g1_t2', awayTeamId: 'g1_t3', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 4', venue: 'المجموعة الأولى' },
+  { id: 'm9', sport: 'football', group: 'groupA', homeTeamId: 'g1_t1', awayTeamId: 'g1_t3', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 5', venue: 'المجموعة الأولى' },
+  { id: 'm10', sport: 'football', group: 'groupA', homeTeamId: 'g1_t2', awayTeamId: 'g1_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 5', venue: 'المجموعة الأولى' },
+
+  // المجموعة الثانية
+  { id: 'm11', sport: 'football', group: 'groupB', homeTeamId: 'g2_t1', awayTeamId: 'g2_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 1', venue: 'المجموعة الثانية' },
+  { id: 'm12', sport: 'football', group: 'groupB', homeTeamId: 'g2_t3', awayTeamId: 'g2_t2', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 1', venue: 'المجموعة الثانية' },
+  { id: 'm13', sport: 'football', group: 'groupB', homeTeamId: 'g2_t3', awayTeamId: 'g2_t1', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 2', venue: 'المجموعة الثانية' },
+  { id: 'm14', sport: 'football', group: 'groupB', homeTeamId: 'g2_t4', awayTeamId: 'g2_t2', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 2', venue: 'المجموعة الثانية' },
+  { id: 'm15', sport: 'football', group: 'groupB', homeTeamId: 'g2_t1', awayTeamId: 'g2_t2', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 3', venue: 'المجموعة الثانية' },
+  { id: 'm16', sport: 'football', group: 'groupB', homeTeamId: 'g2_t3', awayTeamId: 'g2_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 3', venue: 'المجموعة الثانية' },
+
+  // المجموعة الثالثة
+  { id: 'm17', sport: 'football', group: 'groupC', homeTeamId: 'g3_t1', awayTeamId: 'g3_t2', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 1', venue: 'المجموعة الثالثة' },
+  { id: 'm18', sport: 'football', group: 'groupC', homeTeamId: 'g3_t3', awayTeamId: 'g3_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 1', venue: 'المجموعة الثالثة' },
+  { id: 'm19', sport: 'football', group: 'groupC', homeTeamId: 'g3_t3', awayTeamId: 'g3_t1', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 2', venue: 'المجموعة الثالثة' },
+  { id: 'm20', sport: 'football', group: 'groupC', homeTeamId: 'g3_t2', awayTeamId: 'g3_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 2', venue: 'المجموعة الثالثة' },
+  { id: 'm21', sport: 'football', group: 'groupC', homeTeamId: 'g3_t1', awayTeamId: 'g3_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 3', venue: 'المجموعة الثالثة' },
+  { id: 'm22', sport: 'football', group: 'groupC', homeTeamId: 'g3_t2', awayTeamId: 'g3_t3', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 3', venue: 'المجموعة الثالثة' },
+
+  // المجموعة الرابعة
+  { id: 'm23', sport: 'football', group: 'groupD', homeTeamId: 'g4_t1', awayTeamId: 'g4_t3', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 1', venue: 'المجموعة الرابعة' },
+  { id: 'm24', sport: 'football', group: 'groupD', homeTeamId: 'g4_t2', awayTeamId: 'g4_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 1', venue: 'المجموعة الرابعة' },
+  { id: 'm25', sport: 'football', group: 'groupD', homeTeamId: 'g4_t2', awayTeamId: 'g4_t1', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 2', venue: 'المجموعة الرابعة' },
+  { id: 'm26', sport: 'football', group: 'groupD', homeTeamId: 'g4_t3', awayTeamId: 'g4_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 2', venue: 'المجموعة الرابعة' },
+  { id: 'm27', sport: 'football', group: 'groupD', homeTeamId: 'g4_t1', awayTeamId: 'g4_t4', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 3', venue: 'المجموعة الرابعة' },
+  { id: 'm28', sport: 'football', group: 'groupD', homeTeamId: 'g4_t3', awayTeamId: 'g4_t2', homeScore: 0, awayScore: 0, status: 'upcoming', date: 'الجولة 3', venue: 'المجموعة الرابعة' },
+];
+
+const INITIAL_EVENTS = [];
+
+const THEME_PALETTES = {
+  emerald: { bg: 'bg-emerald-600', hover: 'hover:bg-emerald-500', text: 'text-emerald-400', border: 'border-emerald-500/40', badge: 'bg-emerald-500/20 text-emerald-300' },
+  blue: { bg: 'bg-blue-600', hover: 'hover:bg-blue-500', text: 'text-blue-400', border: 'border-blue-500/40', badge: 'bg-blue-500/20 text-blue-300' },
+  rose: { bg: 'bg-rose-600', hover: 'hover:bg-rose-500', text: 'text-rose-400', border: 'border-rose-500/40', badge: 'bg-rose-500/20 text-rose-300' },
+  amber: { bg: 'bg-amber-600', hover: 'hover:bg-amber-500', text: 'text-amber-400', border: 'border-amber-500/40', badge: 'bg-amber-500/20 text-amber-300' },
+  violet: { bg: 'bg-violet-600', hover: 'hover:bg-violet-500', text: 'text-violet-400', border: 'border-violet-500/40', badge: 'bg-violet-500/20 text-violet-300' },
+};
+
+const GROUPS_LIST = ['groupA', 'groupB', 'groupC', 'groupD'];
+
+// ==========================================
+// 3. MAIN APPLICATION COMPONENT
+// ==========================================
+export default function App() {
+  const [lang, setLang] = useState('ar');
+  const [activeView, setActiveView] = useState('dashboard');
+  const [sportSubTab, setSportSubTab] = useState('standings');
+  const [selectedGroupFilter, setSelectedGroupFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Strict Admin Auth State (Passcode: 447466 - hidden from UI)
+  const ADMIN_PASSCODE = '447466';
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  const [showUiModal, setShowUiModal] = useState(false);
+  const [showPwaModal, setShowPwaModal] = useState(false);
+
+  // Selected Team Modal for Roster & Stats
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  // Selected Match Detail Modal for Event Logging
+  const [selectedMatch, setSelectedMatch] = useState(null);
+
+  // New Roster Member Input in Team Modal
+  const [newMemberName, setNewMemberName] = useState('');
+  const [newMemberRole, setNewMemberRole] = useState('player');
+
+  // Selected team & player for logging events inside match modal
+  const [logTeamId, setLogTeamId] = useState('');
+  const [logPlayerName, setLogPlayerName] = useState('');
+  const [logEventType, setLogEventType] = useState('goal');
+
+  const [uiConfig, setUiConfig] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stem_behera_ui_v6_dropdown');
+      return saved ? { ...INITIAL_UI_CONFIG, ...JSON.parse(saved) } : INITIAL_UI_CONFIG;
+    } catch {
+      return INITIAL_UI_CONFIG;
+    }
+  });
+
+  const [teams, setTeams] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stem_behera_teams_v6_dropdown');
+      return saved ? JSON.parse(saved) : INITIAL_TEAMS;
+    } catch {
+      return INITIAL_TEAMS;
+    }
+  });
+
+  const [matches, setMatches] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stem_behera_matches_v6_dropdown');
+      return saved ? JSON.parse(saved) : INITIAL_MATCHES;
+    } catch {
+      return INITIAL_MATCHES;
+    }
+  });
+
+  const [matchEvents, setMatchEvents] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stem_behera_events_v6_dropdown');
+      return saved ? JSON.parse(saved) : INITIAL_EVENTS;
+    } catch {
+      return INITIAL_EVENTS;
+    }
+  });
+
+  // Admin CRUD Forms
+  const [newTeam, setNewTeam] = useState({ name: '', logo: '⚽', group: 'groupA', captain: '', gk: '' });
+  const [newMatch, setNewMatch] = useState({ homeTeamId: '', awayTeamId: '', group: 'groupA', date: 'الجولة 1', status: 'upcoming' });
+
+  useEffect(() => {
+    try { localStorage.setItem('stem_behera_ui_v6_dropdown', JSON.stringify(uiConfig)); } catch (e) {}
+  }, [uiConfig]);
+  useEffect(() => {
+    try { localStorage.setItem('stem_behera_teams_v6_dropdown', JSON.stringify(teams)); } catch (e) {}
+  }, [teams]);
+  useEffect(() => {
+    try { localStorage.setItem('stem_behera_matches_v6_dropdown', JSON.stringify(matches)); } catch (e) {}
+  }, [matches]);
+  useEffect(() => {
+    try { localStorage.setItem('stem_behera_events_v6_dropdown', JSON.stringify(matchEvents)); } catch (e) {}
+  }, [matchEvents]);
+
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.ar;
+  const isRtl = lang === 'ar';
+  const palette = THEME_PALETTES[uiConfig?.theme] || THEME_PALETTES.emerald;
+  const isDark = uiConfig?.darkMode !== false;
+
+  const handleLoginSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (passwordInput.trim() === ADMIN_PASSCODE) {
+      setIsAdmin(true);
+      setShowLoginModal(false);
+      setPasswordInput('');
+      setLoginError('');
+    } else {
+      setLoginError(t.wrongPassword);
+    }
+  };
+
+  const handleResetZeroData = () => {
+    setUiConfig(INITIAL_UI_CONFIG);
+    setTeams(INITIAL_TEAMS);
+    setMatches(INITIAL_MATCHES);
+    setMatchEvents(INITIAL_EVENTS);
+  };
+
+  const handleAddTeam = (sportKey) => {
+    if (!newTeam.name.trim()) return;
+    const created = {
+      id: 't_' + Date.now(),
+      name: newTeam.name.trim(),
+      sport: sportKey,
+      group: newTeam.group || 'groupA',
+      logo: newTeam.logo.trim() || '⚽',
+      captain: newTeam.captain || 'غير محدد',
+      gk: newTeam.gk || 'غير محدد',
+      players: []
+    };
+    setTeams(prev => [...prev, created]);
+    setNewTeam({ name: '', logo: '⚽', group: 'groupA', captain: '', gk: '' });
+  };
+
+  const handleDeleteTeam = (id) => {
+    setTeams(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleAddRosterMember = (teamId) => {
+    if (!newMemberName.trim()) return;
+    setTeams(prev => prev.map(tm => {
+      if (tm.id !== teamId) return tm;
+      if (newMemberRole === 'captain') {
+        return { ...tm, captain: newMemberName.trim() };
+      } else if (newMemberRole === 'gk') {
+        return { ...tm, gk: newMemberName.trim() };
+      } else {
+        return { ...tm, players: [...(tm.players || []), newMemberName.trim()] };
+      }
+    }));
+    setNewMemberName('');
+  };
+
+  const handleDeletePlayer = (teamId, playerName) => {
+    setTeams(prev => prev.map(tm => {
+      if (tm.id !== teamId) return tm;
+      return { ...tm, players: (tm.players || []).filter(pl => pl !== playerName) };
+    }));
+    if (selectedTeam && selectedTeam.id === teamId) {
+      setSelectedTeam(prev => ({ ...prev, players: (prev.players || []).filter(pl => pl !== playerName) }));
+    }
+  };
+
+  const handleClearTeamRole = (teamId, role) => {
+    setTeams(prev => prev.map(tm => {
+      if (tm.id !== teamId) return tm;
+      if (role === 'captain') return { ...tm, captain: 'غير محدد' };
+      if (role === 'gk') return { ...tm, gk: 'غير محدد' };
+      return tm;
+    }));
+    if (selectedTeam && selectedTeam.id === teamId) {
+      setSelectedTeam(prev => ({ ...prev, [role]: 'غير محدد' }));
+    }
+  };
+
+  const handleAddMatch = (sportKey) => {
+    if (!newMatch.homeTeamId || !newMatch.awayTeamId || newMatch.homeTeamId === newMatch.awayTeamId) return;
+    const homeTeamObj = getTeam(newMatch.homeTeamId);
+    const created = {
+      id: 'm_' + Date.now(),
+      sport: sportKey,
+      group: homeTeamObj.group || newMatch.group || 'groupA',
+      homeTeamId: newMatch.homeTeamId,
+      awayTeamId: newMatch.awayTeamId,
+      homeScore: 0,
+      awayScore: 0,
+      status: newMatch.status || 'upcoming',
+      date: newMatch.date || 'الجولة 1',
+      venue: t[homeTeamObj.group] || 'المجموعة الأولى'
+    };
+    setMatches(prev => [created, ...prev]);
+    setNewMatch({ homeTeamId: '', awayTeamId: '', group: 'groupA', date: 'الجولة 1', status: 'upcoming' });
+  };
+
+  const handleScoreUpdate = (matchId, side, delta) => {
+    setMatches(prev => prev.map(m => {
+      if (m.id !== matchId) return m;
+      const key = side === 'home' ? 'homeScore' : 'awayScore';
+      const newVal = Math.max(0, (Number(m[key]) || 0) + delta);
+      return { ...m, [key]: newVal };
+    }));
+  };
+
+  const handleStatusChange = (matchId, newStatus) => {
+    setMatches(prev => prev.map(m => m.id === matchId ? { ...m, status: newStatus } : m));
+  };
+
+  const handleDeleteMatch = (matchId) => {
+    setMatches(prev => prev.filter(m => m.id !== matchId));
+    setMatchEvents(prev => prev.filter(ev => ev.matchId !== matchId));
+  };
+
+  const handleLogMatchEvent = (matchId, teamId, playerName, type) => {
+    if (!playerName) return;
+    const newEv = {
+      id: 'ev_' + Date.now(),
+      matchId,
+      teamId,
+      playerName,
+      type
+    };
+    setMatchEvents(prev => [...prev, newEv]);
+
+    // إذا كان الحدث هدفاً، قم بزيادة نتيجة الفريق تلقائياً
+    if (type === 'goal') {
+      setMatches(prev => prev.map(m => {
+        if (m.id !== matchId) return m;
+        if (m.homeTeamId === teamId) {
+          return { ...m, homeScore: (Number(m.homeScore) || 0) + 1 };
+        } else if (m.awayTeamId === teamId) {
+          return { ...m, awayScore: (Number(m.awayScore) || 0) + 1 };
+        }
+        return m;
+      }));
+    }
+  };
+
+  const handleDeleteMatchEvent = (eventId) => {
+    setMatchEvents(prev => prev.filter(ev => ev.id !== eventId));
+  };
+
+  const getTeam = (teamId) => {
+    return (teams || []).find(tm => tm.id === teamId) || { name: 'غير محدد', logo: '⚽', group: 'groupA', captain: '-', gk: '-', players: [] };
+  };
+
+  // Helper to get all player names for a specific team (Captain + GK + Players)
+  const getTeamRosterList = (teamId) => {
+    const tm = getTeam(teamId);
+    const list = [];
+    if (tm.captain && tm.captain !== 'غير محدد' && tm.captain !== '-') list.push(tm.captain + ' (كابتن)');
+    if (tm.gk && tm.gk !== 'غير محدد' && tm.gk !== '-') list.push(tm.gk + ' (حارس)');
+    if (tm.players && tm.players.length > 0) {
+      tm.players.forEach(p => list.push(p));
+    }
+    return list;
+  };
+
+  const calculateStandings = (sportKey, groupKey = null) => {
+    const sportTeams = (teams || []).filter(tm => tm.sport === sportKey && (!groupKey || tm.group === groupKey));
+    const sportMatches = (matches || []).filter(
+      m => m.sport === sportKey && (m.status === 'completed' || m.status === 'live') && (!groupKey || m.group === groupKey)
+    );
+
+    const table = sportTeams.map(team => ({
+      teamId: team.id,
+      name: team.name,
+      logo: team.logo,
+      group: team.group,
+      played: 0,
+      won: 0,
+      drawn: 0,
+      lost: 0,
+      gf: 0,
+      ga: 0,
+      gd: 0,
+      points: 0
+    }));
+
+    sportMatches.forEach(m => {
+      const home = table.find(r => r.teamId === m.homeTeamId);
+      const away = table.find(r => r.teamId === m.awayTeamId);
+      if (!home || !away) return;
+
+      const hs = Number(m.homeScore) || 0;
+      const as = Number(m.awayScore) || 0;
+
+      home.played += 1;
+      away.played += 1;
+      home.gf += hs;
+      home.ga += as;
+      away.gf += as;
+      away.ga += hs;
+
+      if (hs > as) {
+        home.won += 1;
+        home.points += 3;
+        away.lost += 1;
+      } else if (hs < as) {
+        away.won += 1;
+        away.points += 3;
+        home.lost += 1;
+      } else {
+        home.drawn += 1;
+        away.drawn += 1;
+        home.points += 1;
+        away.points += 1;
+      }
+    });
+
+    table.forEach(r => { r.gd = r.gf - r.ga; });
+    return table.sort((a, b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
+  };
+
+  const calculateTopScorers = () => {
+    const counts = {};
+    matchEvents.filter(ev => ev.type === 'goal').forEach(ev => {
+      const cleanName = (ev.playerName || '').replace(' (كابتن)', '').replace(' (حارس)', '').trim();
+      const key = cleanName || 'لاعب';
+      if (!counts[key]) {
+        counts[key] = { name: key, teamId: ev.teamId, goals: 0 };
+      }
+      counts[key].goals += 1;
+    });
+    return Object.values(counts).sort((a, b) => b.goals - a.goals);
+  };
+
+  const calculateManOfTheMatch = () => {
+    const counts = {};
+    matchEvents.filter(ev => ev.type === 'mom').forEach(ev => {
+      const cleanName = (ev.playerName || '').replace(' (كابتن)', '').replace(' (حارس)', '').trim();
+      const key = cleanName || 'لاعب';
+      if (!counts[key]) {
+        counts[key] = { name: key, teamId: ev.teamId, awards: 0 };
+      }
+      counts[key].awards += 1;
+    });
+    return Object.values(counts).sort((a, b) => b.awards - a.awards);
+  };
+
+  const isSportPage = ['football', 'volleyball', 'table_tennis', 'chess'].includes(activeView);
+  const sportOrderList = uiConfig?.sportOrder || ['football', 'volleyball', 'table_tennis', 'chess'];
+
+  // ==========================================
+  // 5. RENDER UI
+  // ==========================================
+  return (
+    <div
+      dir={isRtl ? 'rtl' : 'ltr'}
+      className={`min-h-screen transition-colors duration-300 ${
+        isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+      } font-sans`}
+    >
+      {/* LIVE ANNOUNCEMENT TOP BAR */}
+      <div className={`${palette.bg} text-white px-4 py-2 text-xs md:text-sm font-medium flex items-center justify-between shadow-md`}>
+        <div className="flex items-center gap-2 truncate">
+          <Activity className="w-4 h-4 animate-pulse shrink-0" />
+          <span className="truncate">
+            {isRtl ? uiConfig?.announcementAr : uiConfig?.announcementEn}
+          </span>
+        </div>
+        <span className="hidden md:inline-block text-xs bg-black/20 px-2.5 py-0.5 rounded-full shrink-0">
+          STEM Behera 2026
+        </span>
+      </div>
+
+      {/* MAIN NAVIGATION HEADER */}
+      <header className={`sticky top-0 z-30 backdrop-blur-md border-b ${
+        isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          {/* Brand Logo */}
+          <div
+            onClick={() => setActiveView('dashboard')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className={`w-11 h-11 rounded-xl ${palette.bg} flex items-center justify-center text-white shadow-lg`}>
+              <Trophy className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="font-extrabold text-base md:text-lg leading-tight">
+                {t.appTitle}
+              </h1>
+              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                {t.schoolName}
+              </p>
+            </div>
+          </div>
+
+          {/* Center Nav Links */}
+          <nav className="flex items-center gap-1 md:gap-2 overflow-x-auto py-1">
+            <button
+              onClick={() => setActiveView('dashboard')}
+              className={`px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition ${
+                activeView === 'dashboard'
+                  ? `${palette.bg} text-white shadow`
+                  : isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-200 text-slate-700'
+              }`}
+            >
+              {t.dashboard}
+            </button>
+            <button
+              onClick={() => {
+                setActiveView('football');
+                setSportSubTab('standings');
+              }}
+              className={`px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition ${
+                activeView === 'football'
+                  ? `${palette.bg} text-white shadow`
+                  : isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-200 text-slate-700'
+              }`}
+            >
+              ⚽ {t.football}
+            </button>
+            <button
+              onClick={() => setActiveView('allMatches')}
+              className={`px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition ${
+                activeView === 'allMatches'
+                  ? `${palette.bg} text-white shadow`
+                  : isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-200 text-slate-700'
+              }`}
+            >
+              {t.allMatches}
+            </button>
+            <button
+              onClick={() => setActiveView('studentsDb')}
+              className={`px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition ${
+                activeView === 'studentsDb'
+                  ? `${palette.bg} text-white shadow`
+                  : isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-200 text-slate-700'
+              }`}
+            >
+              {t.studentsDb}
+            </button>
+          </nav>
+
+          {/* Right Utilities */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setLang(prev => (prev === 'ar' ? 'en' : 'ar'))}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border transition ${
+                isDark ? 'border-slate-700 bg-slate-800 hover:bg-slate-700' : 'border-slate-300 bg-slate-100 hover:bg-slate-200'
+              }`}
+            >
+              <Globe className="w-4 h-4" />
+              <span>{lang === 'ar' ? 'English' : 'العربية'}</span>
+            </button>
+
+            {isAdmin && (
+              <>
+                <button
+                  onClick={() => setShowUiModal(true)}
+                  title={t.customizeUi}
+                  className={`p-2 rounded-lg border transition ${
+                    isDark ? 'border-slate-700 bg-slate-800 hover:bg-slate-700 text-amber-400' : 'border-slate-300 bg-slate-100 text-amber-600'
+                  }`}
+                >
+                  <Palette className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setShowPwaModal(true)}
+                  title={t.pwaSetup}
+                  className={`p-2 rounded-lg border transition ${
+                    isDark ? 'border-slate-700 bg-slate-800 hover:bg-slate-700 text-cyan-400' : 'border-slate-300 bg-slate-100 text-cyan-600'
+                  }`}
+                >
+                  <Code className="w-4 h-4" />
+                </button>
+              </>
+            )}
+
+            {!isAdmin ? (
+              <button
+                onClick={() => {
+                  setLoginError('');
+                  setPasswordInput('');
+                  setShowLoginModal(true);
+                }}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-white ${palette.bg} ${palette.hover} shadow`}
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>{t.adminLogin}</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  <Unlock className="w-3.5 h-3.5" />
+                  {t.adminActive}
+                </span>
+                <button
+                  onClick={() => setIsAdmin(false)}
+                  className="p-2 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 border border-rose-500/30"
+                  title={t.logout}
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* MAIN CONTENT CONTAINER */}
+      <main className="max-w-7xl mx-auto px-4 py-6 space-y-8">
+        {/* ==========================================
+            VIEW 1: MAIN DASHBOARD
+           ========================================== */}
+        {activeView === 'dashboard' && (
+          <div className="space-y-8">
+            {/* Quick Stats Banner */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                <p className="text-xs text-slate-400">{t.teams}</p>
+                <p className="text-2xl font-black mt-1">{(teams || []).length}</p>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                <p className="text-xs text-slate-400">{t.completed}</p>
+                <p className="text-2xl font-black mt-1 text-emerald-400">
+                  {(matches || []).filter(m => m.status === 'completed').length}
+                </p>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                <p className="text-xs text-slate-400">{t.upcoming}</p>
+                <p className="text-2xl font-black mt-1 text-amber-400">
+                  {(matches || []).filter(m => m.status === 'upcoming').length}
+                </p>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                <p className="text-xs text-slate-400">{t.goals}</p>
+                <p className="text-2xl font-black mt-1 text-rose-400">
+                  {(matches || []).reduce((acc, m) => acc + (Number(m.homeScore) || 0) + (Number(m.awayScore) || 0), 0)}
+                </p>
+              </div>
+            </div>
+
+            {/* Interactive Sports Grid */}
+            <div className={`grid grid-cols-1 md:grid-cols-2 ${uiConfig?.gridCols === 2 ? 'lg:grid-cols-2' : 'lg:grid-cols-4'} gap-6`}>
+              {sportOrderList.map(sportKey => {
+                const sportMatches = (matches || []).filter(m => m.sport === sportKey);
+                const sportTeams = (teams || []).filter(tm => tm.sport === sportKey);
+                const coverUrl = uiConfig?.sportCovers?.[sportKey] || INITIAL_UI_CONFIG.sportCovers[sportKey];
+
+                return (
+                  <div
+                    key={sportKey}
+                    onClick={() => {
+                      setActiveView(sportKey);
+                      setSportSubTab('standings');
+                    }}
+                    className={`group cursor-pointer rounded-2xl overflow-hidden border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                      isDark ? 'bg-slate-900 border-slate-800 hover:border-slate-700' : 'bg-white border-slate-200'
+                    }`}
+                  >
+                    <div className="relative h-44 overflow-hidden bg-slate-800">
+                      <img
+                        src={coverUrl}
+                        alt={t[sportKey]}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                      <div className="absolute bottom-3 inset-x-4 flex items-end justify-between text-white">
+                        <div>
+                          <h3 className="text-xl font-extrabold">{t[sportKey]}</h3>
+                          <p className="text-xs text-slate-300">
+                            {sportTeams.length} {t.teamName} • {sportMatches.length} {t.matches}
+                          </p>
+                        </div>
+                        <span className={`p-2 rounded-xl ${palette.bg} text-white shadow`}>
+                          {isRtl ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Upcoming Fixtures Preview */}
+            <div className={`p-6 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-extrabold flex items-center gap-2">
+                  <Calendar className={`w-5 h-5 ${palette.text}`} />
+                  <span>{t.matches}</span>
+                </h2>
+                <button
+                  onClick={() => setActiveView('allMatches')}
+                  className={`text-xs font-bold ${palette.text} hover:underline`}
+                >
+                  {isRtl ? 'عرض الكل ←' : 'View All →'}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(matches || []).slice(0, 6).map(m => {
+                  const home = getTeam(m.homeTeamId);
+                  const away = getTeam(m.awayTeamId);
+                  return (
+                    <div
+                      key={m.id}
+                      onClick={() => {
+                        setSelectedMatch(m);
+                        setLogTeamId(m.homeTeamId);
+                      }}
+                      className={`p-4 rounded-xl border cursor-pointer hover:border-emerald-500/50 transition ${
+                        isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-xs mb-3">
+                        <span className={`font-bold px-2 py-0.5 rounded ${palette.badge}`}>
+                          {t[m.group] || m.venue}
+                        </span>
+                        <span className="px-2 py-0.5 rounded font-bold bg-amber-500/20 text-amber-400">
+                          {t[m.status]}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 my-2">
+                        <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                          <span className="text-lg">{home.logo}</span>
+                          <span className="font-bold text-xs md:text-sm truncate">{home.name}</span>
+                        </div>
+                        <div className="px-3 py-1 rounded-lg bg-slate-800 text-white font-black text-sm shrink-0">
+                          {m.homeScore} - {m.awayScore}
+                        </div>
+                        <div className="flex items-center justify-end gap-1.5 flex-1 min-w-0">
+                          <span className="font-bold text-xs md:text-sm truncate">{away.name}</span>
+                          <span className="text-lg">{away.logo}</span>
+                        </div>
+                      </div>
+
+                      <div className="text-[11px] text-slate-400 mt-2 pt-2 border-t border-slate-800/60 flex justify-between">
+                        <span>{m.date}</span>
+                        <span className="text-emerald-400">انقر للتفاصيل وتسجيل الأهداف ⚽</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==========================================
+            VIEW 2: GLOBAL ALL MATCHES VIEW
+           ========================================== */}
+        {activeView === 'allMatches' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="text-2xl font-black">{t.allMatches} (28)</h2>
+              <div className="flex flex-wrap gap-2">
+                <select
+                  value={selectedGroupFilter}
+                  onChange={e => setSelectedGroupFilter(e.target.value)}
+                  className={`px-3 py-2 rounded-xl text-xs font-bold border ${
+                    isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                  }`}
+                >
+                  <option value="all">{t.allGroups}</option>
+                  {GROUPS_LIST.map(gk => (
+                    <option key={gk} value={gk}>{t[gk]}</option>
+                  ))}
+                </select>
+
+                <div className="relative w-full sm:w-64">
+                  <Search className="w-4 h-4 absolute top-2.5 start-3 text-slate-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder={t.searchPlaceholder}
+                    className={`w-full ps-9 pe-4 py-2 rounded-xl text-xs border outline-none ${
+                      isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                    }`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(matches || [])
+                .filter(m => selectedGroupFilter === 'all' || m.group === selectedGroupFilter)
+                .filter(m => {
+                  if (!searchQuery.trim()) return true;
+                  const q = searchQuery.toLowerCase();
+                  const h = getTeam(m.homeTeamId).name.toLowerCase();
+                  const a = getTeam(m.awayTeamId).name.toLowerCase();
+                  return h.includes(q) || a.includes(q) || (m.venue || '').toLowerCase().includes(q) || (m.date || '').toLowerCase().includes(q);
+                })
+                .map(m => {
+                  const home = getTeam(m.homeTeamId);
+                  const away = getTeam(m.awayTeamId);
+                  return (
+                    <div
+                      key={m.id}
+                      className={`p-5 rounded-2xl border ${
+                        isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${palette.badge}`}>
+                          {t[m.group] || t[m.sport]} • {m.date}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {isAdmin ? (
+                            <select
+                              value={m.status}
+                              onChange={e => handleStatusChange(m.id, e.target.value)}
+                              className="text-xs bg-slate-800 text-white rounded px-2 py-1 border border-slate-700"
+                            >
+                              <option value="upcoming">{t.upcoming}</option>
+                              <option value="live">{t.live}</option>
+                              <option value="completed">{t.completed}</option>
+                            </select>
+                          ) : (
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                              m.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+                            }`}>
+                              {t[m.status]}
+                            </span>
+                          )}
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDeleteMatch(m.id)}
+                              className="p-1 text-rose-400 hover:bg-rose-500/20 rounded"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between my-4">
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => setSelectedTeam(home)}>
+                          <span className="text-2xl">{home.logo}</span>
+                          <span className="font-bold hover:underline">{home.name}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {isAdmin && (
+                            <div className="flex flex-col gap-1">
+                              <button onClick={() => handleScoreUpdate(m.id, 'home', 1)} className="px-2 py-0.5 bg-slate-800 rounded text-xs">+</button>
+                              <button onClick={() => handleScoreUpdate(m.id, 'home', -1)} className="px-2 py-0.5 bg-slate-800 rounded text-xs">-</button>
+                            </div>
+                          )}
+                          <div 
+                            onClick={() => {
+                              setSelectedMatch(m);
+                              setLogTeamId(m.homeTeamId);
+                            }}
+                            className="px-4 py-2 rounded-xl bg-slate-800 text-white font-black text-xl cursor-pointer hover:bg-slate-700 transition"
+                            title="انقر لتسجيل الأهداف والبطاقات"
+                          >
+                            {m.homeScore} - {m.awayScore}
+                          </div>
+                          {isAdmin && (
+                            <div className="flex flex-col gap-1">
+                              <button onClick={() => handleScoreUpdate(m.id, 'away', 1)} className="px-2 py-0.5 bg-slate-800 rounded text-xs">+</button>
+                              <button onClick={() => handleScoreUpdate(m.id, 'away', -1)} className="px-2 py-0.5 bg-slate-800 rounded text-xs">-</button>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => setSelectedTeam(away)}>
+                          <span className="font-bold hover:underline">{away.name}</span>
+                          <span className="text-2xl">{away.logo}</span>
+                        </div>
+                      </div>
+
+                      <div className="text-center mt-2">
+                        <button
+                          onClick={() => {
+                            setSelectedMatch(m);
+                            setLogTeamId(m.homeTeamId);
+                          }}
+                          className={`text-xs font-bold ${palette.text} hover:underline`}
+                        >
+                          ⚽ تفاصيل المباراة وسجل الأهداف (انقر هنا)
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
+        {/* ==========================================
+            VIEW 3: STUDENT & PLAYER DATABASE
+           ========================================== */}
+        {activeView === 'studentsDb' && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-black">{t.studentsDb}</h2>
+            <div className={`p-8 rounded-2xl border text-center ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <Users className="w-12 h-12 mx-auto text-slate-500 mb-3" />
+              <p className="text-sm text-slate-300">تم دمج قوائم أعضاء الفرق (الكابتن، حارس المرمى، واللاعبون) مباشرة داخل بطاقة كل فريق في قسم **الفرق والمجموعات**. يمكنك النقر على أي فريق لرؤية تشكيلته الكاملة وتعديلها أو حذف أي لاعب عند فتح وضع الأدمن!</p>
+            </div>
+          </div>
+        )}
+
+        {/* ==========================================
+            VIEW 4: SPORT MODULE (FOOTBALL 4-GROUPS & TABS)
+           ========================================== */}
+        {isSportPage && (
+          <div className="space-y-6">
+            {/* Sport Header */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <button
+                  onClick={() => setActiveView('dashboard')}
+                  className="text-xs text-slate-400 hover:text-white mb-1 inline-flex items-center gap-1"
+                >
+                  {isRtl ? '→ العودة للرئيسية' : '← Back to Dashboard'}
+                </button>
+                <h2 className="text-3xl font-black">{t[activeView]}</h2>
+              </div>
+
+              {/* Sub-Tabs Navigation */}
+              <div className="flex flex-wrap gap-1.5">
+                {['standings', 'matches', 'results', 'teams', ...(activeView === 'football' ? ['stats'] : []), 'rules'].map(tabKey => (
+                  <button
+                    key={tabKey}
+                    onClick={() => setSportSubTab(tabKey)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                      sportSubTab === tabKey
+                        ? `${palette.bg} text-white shadow`
+                        : isDark ? 'bg-slate-900 text-slate-300 hover:bg-slate-800' : 'bg-white text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    {t[tabKey]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Group Filter Bar for Football */}
+            {activeView === 'football' && ['standings', 'matches', 'results', 'teams'].includes(sportSubTab) && (
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setSelectedGroupFilter('all')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                    selectedGroupFilter === 'all'
+                      ? `${palette.bg} text-white border-transparent`
+                      : isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-300 text-slate-700'
+                  }`}
+                >
+                  {t.allGroups} (4)
+                </button>
+                {GROUPS_LIST.map(gk => (
+                  <button
+                    key={gk}
+                    onClick={() => setSelectedGroupFilter(gk)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                      selectedGroupFilter === gk
+                        ? `${palette.bg} text-white border-transparent`
+                        : isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-300 text-slate-700'
+                    }`}
+                  >
+                    {t[gk]}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* SUB-TAB 1: STANDINGS TABLE (4 GROUPS FOR FOOTBALL) */}
+            {sportSubTab === 'standings' && (
+              <div className="space-y-6">
+                {activeView === 'football' ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {GROUPS_LIST
+                      .filter(gk => selectedGroupFilter === 'all' || selectedGroupFilter === gk)
+                      .map(groupKey => {
+                        const rows = calculateStandings('football', groupKey);
+                        return (
+                          <div
+                            key={groupKey}
+                            className={`rounded-2xl border overflow-hidden ${
+                              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                            }`}
+                          >
+                            <div className={`px-5 py-3.5 border-b flex items-center justify-between ${
+                              isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-slate-100 border-slate-200'
+                            }`}>
+                              <h3 className="font-black text-base flex items-center gap-2">
+                                <Trophy className={`w-4 h-4 ${palette.text}`} />
+                                <span>{t[groupKey]}</span>
+                              </h3>
+                              <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${palette.badge}`}>
+                                {rows.length} {t.teams}
+                              </span>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs md:text-sm">
+                                <thead className={`text-[11px] uppercase border-b ${
+                                  isDark ? 'bg-slate-950/40 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200'
+                                }`}>
+                                  <tr>
+                                    <th className="py-3 px-3 text-start">#</th>
+                                    <th className="py-3 px-3 text-start">{t.teamName}</th>
+                                    <th className="py-3 px-2 text-center">{t.played}</th>
+                                    <th className="py-3 px-2 text-center">{t.won}</th>
+                                    <th className="py-3 px-2 text-center">{t.drawn}</th>
+                                    <th className="py-3 px-2 text-center">{t.lost}</th>
+                                    <th className="py-3 px-2 text-center">{t.gf}</th>
+                                    <th className="py-3 px-2 text-center">{t.ga}</th>
+                                    <th className="py-3 px-2 text-center">{t.gd}</th>
+                                    <th className="py-3 px-3 text-center font-black">{t.points}</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-800/50">
+                                  {rows.map((row, idx) => (
+                                    <tr 
+                                      key={row.teamId} 
+                                      onClick={() => setSelectedTeam(teams.find(tm => tm.id === row.teamId))}
+                                      className="hover:bg-slate-800/30 cursor-pointer transition"
+                                    >
+                                      <td className="py-3 px-3 font-bold">{idx + 1}</td>
+                                      <td className="py-3 px-3 font-bold flex items-center gap-2">
+                                        <span className="text-lg">{row.logo}</span>
+                                        <span className="hover:underline">{row.name}</span>
+                                      </td>
+                                      <td className="py-3 px-2 text-center">{row.played}</td>
+                                      <td className="py-3 px-2 text-center text-emerald-400 font-bold">{row.won}</td>
+                                      <td className="py-3 px-2 text-center text-amber-400 font-bold">{row.drawn}</td>
+                                      <td className="py-3 px-2 text-center text-rose-400 font-bold">{row.lost}</td>
+                                      <td className="py-3 px-2 text-center text-slate-300">{row.gf}</td>
+                                      <td className="py-3 px-2 text-center text-slate-400">{row.ga}</td>
+                                      <td className="py-3 px-2 text-center font-bold">
+                                        {row.gd > 0 ? `+${row.gd}` : row.gd}
+                                      </td>
+                                      <td className="py-3 px-3 text-center font-black text-base text-emerald-400">
+                                        {row.points}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                ) : (
+                  <div className={`rounded-2xl border overflow-x-auto ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                    <table className="w-full text-sm">
+                      <thead className={`text-xs uppercase border-b ${isDark ? 'bg-slate-950/60 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200'}`}>
+                        <tr>
+                          <th className="py-3.5 px-4 text-start">#</th>
+                          <th className="py-3.5 px-4 text-start">{t.teamName}</th>
+                          <th className="py-3.5 px-4 text-center">{t.played}</th>
+                          <th className="py-3.5 px-4 text-center">{t.won}</th>
+                          <th className="py-3.5 px-4 text-center">{t.drawn}</th>
+                          <th className="py-3.5 px-4 text-center">{t.lost}</th>
+                          <th className="py-3.5 px-4 text-center font-black">{t.points}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/50">
+                        {calculateStandings(activeView).map((row, idx) => (
+                          <tr key={row.teamId} onClick={() => setSelectedTeam(teams.find(tm => tm.id === row.teamId))} className="cursor-pointer hover:bg-slate-800/20">
+                            <td className="py-3 px-4 font-bold">{idx + 1}</td>
+                            <td className="py-3 px-4 font-bold">{row.logo} {row.name}</td>
+                            <td className="py-3 px-4 text-center">{row.played}</td>
+                            <td className="py-3 px-4 text-center text-emerald-400">{row.won}</td>
+                            <td className="py-3 px-4 text-center text-amber-400">{row.drawn}</td>
+                            <td className="py-3 px-4 text-center text-rose-400">{row.lost}</td>
+                            <td className="py-3 px-4 text-center font-black">{row.points}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* SUB-TAB 2 & 3: MATCHES (UPCOMING) & RESULTS (COMPLETED) */}
+            {(sportSubTab === 'matches' || sportSubTab === 'results') && (
+              <div className="space-y-6">
+                {isAdmin && (
+                  <div className={`p-4 rounded-2xl border grid grid-cols-1 md:grid-cols-5 gap-3 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                    <select
+                      value={newMatch.group}
+                      onChange={e => setNewMatch(prev => ({ ...prev, group: e.target.value }))}
+                      className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300'}`}
+                    >
+                      {GROUPS_LIST.map(gk => (
+                        <option key={gk} value={gk}>{t[gk]}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={newMatch.homeTeamId}
+                      onChange={e => setNewMatch(prev => ({ ...prev, homeTeamId: e.target.value }))}
+                      className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300'}`}
+                    >
+                      <option value="">{t.homeTeam}</option>
+                      {(teams || []).filter(tm => tm.sport === activeView).map(tm => (
+                        <option key={tm.id} value={tm.id}>{tm.name} ({t[tm.group]})</option>
+                      ))}
+                    </select>
+                    <select
+                      value={newMatch.awayTeamId}
+                      onChange={e => setNewMatch(prev => ({ ...prev, awayTeamId: e.target.value }))}
+                      className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300'}`}
+                    >
+                      <option value="">{t.awayTeam}</option>
+                      {(teams || []).filter(tm => tm.sport === activeView).map(tm => (
+                        <option key={tm.id} value={tm.id}>{tm.name} ({t[tm.group]})</option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      placeholder={t.matchDate}
+                      value={newMatch.date}
+                      onChange={e => setNewMatch(prev => ({ ...prev, date: e.target.value }))}
+                      className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300'}`}
+                    />
+                    <button
+                      onClick={() => handleAddMatch(activeView)}
+                      className={`px-4 py-2 rounded-xl text-sm font-bold text-white ${palette.bg} flex items-center justify-center gap-1`}
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>{t.addMatch}</span>
+                    </button>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(matches || [])
+                    .filter(m => m.sport === activeView)
+                    .filter(m => selectedGroupFilter === 'all' || m.group === selectedGroupFilter)
+                    .filter(m => (sportSubTab === 'results' ? m.status === 'completed' : m.status !== 'completed'))
+                    .map(m => {
+                      const home = getTeam(m.homeTeamId);
+                      const away = getTeam(m.awayTeamId);
+                      return (
+                        <div key={m.id} className={`p-5 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                          <div className="flex justify-between items-center mb-3">
+                            <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${palette.badge}`}>
+                              {t[m.group] || m.venue} • {m.date}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              {isAdmin ? (
+                                <select
+                                  value={m.status}
+                                  onChange={e => handleStatusChange(m.id, e.target.value)}
+                                  className="text-xs bg-slate-800 text-white rounded px-2 py-1"
+                                >
+                                  <option value="upcoming">{t.upcoming}</option>
+                                  <option value="live">{t.live}</option>
+                                  <option value="completed">{t.completed}</option>
+                                </select>
+                              ) : (
+                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                                  m.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+                                }`}>
+                                  {t[m.status]}
+                                </span>
+                              )}
+                              {isAdmin && (
+                                <button onClick={() => handleDeleteMatch(m.id)} className="text-rose-400 hover:bg-rose-500/20 p-1 rounded">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between my-3">
+                            <div className="font-bold flex items-center gap-2 cursor-pointer" onClick={() => setSelectedTeam(home)}>
+                              <span className="text-2xl">{home.logo}</span>
+                              <span className="hover:underline">{home.name}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {isAdmin && (
+                                <div className="flex flex-col gap-1">
+                                  <button onClick={() => handleScoreUpdate(m.id, 'home', 1)} className="px-2 py-0.5 bg-slate-800 rounded text-xs">+</button>
+                                  <button onClick={() => handleScoreUpdate(m.id, 'home', -1)} className="px-2 py-0.5 bg-slate-800 rounded text-xs">-</button>
+                                </div>
+                              )}
+                              <span 
+                                onClick={() => {
+                                  setSelectedMatch(m);
+                                  setLogTeamId(m.homeTeamId);
+                                }}
+                                className="px-4 py-1.5 rounded-xl bg-slate-800 text-white font-black text-lg cursor-pointer hover:bg-slate-700 transition"
+                              >
+                                {m.homeScore} : {m.awayScore}
+                              </span>
+                              {isAdmin && (
+                                <div className="flex flex-col gap-1">
+                                  <button onClick={() => handleScoreUpdate(m.id, 'away', 1)} className="px-2 py-0.5 bg-slate-800 rounded text-xs">+</button>
+                                  <button onClick={() => handleScoreUpdate(m.id, 'away', -1)} className="px-2 py-0.5 bg-slate-800 rounded text-xs">-</button>
+                                </div>
+                              )}
+                            </div>
+                            <div className="font-bold flex items-center gap-2 cursor-pointer" onClick={() => setSelectedTeam(away)}>
+                              <span className="hover:underline">{away.name}</span>
+                              <span className="text-2xl">{away.logo}</span>
+                            </div>
+                          </div>
+
+                          <div className="text-center mt-2">
+                            <button
+                              onClick={() => {
+                                setSelectedMatch(m);
+                                setLogTeamId(m.homeTeamId);
+                              }}
+                              className={`text-xs font-bold ${palette.text} hover:underline`}
+                            >
+                              ⚽ تفاصيل المباراة وتسجيل الأهداف والبطاقات (انقر هنا)
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+
+            {/* SUB-TAB 4: TEAMS */}
+            {sportSubTab === 'teams' && (
+              <div className="space-y-6">
+                {isAdmin && (
+                  <div className={`p-4 rounded-2xl border flex flex-wrap gap-3 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                    <input
+                      type="text"
+                      placeholder={t.teamName}
+                      value={newTeam.name}
+                      onChange={e => setNewTeam(prev => ({ ...prev, name: e.target.value }))}
+                      className={`flex-1 min-w-[180px] px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300'}`}
+                    />
+                    <select
+                      value={newTeam.group}
+                      onChange={e => setNewTeam(prev => ({ ...prev, group: e.target.value }))}
+                      className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300'}`}
+                    >
+                      {GROUPS_LIST.map(gk => (
+                        <option key={gk} value={gk}>{t[gk]}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      placeholder={t.teamLogo}
+                      value={newTeam.logo}
+                      onChange={e => setNewTeam(prev => ({ ...prev, logo: e.target.value }))}
+                      className={`w-24 px-3 py-2 rounded-xl text-sm border text-center ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300'}`}
+                    />
+                    <button
+                      onClick={() => handleAddTeam(activeView)}
+                      className={`px-4 py-2 rounded-xl text-sm font-bold text-white ${palette.bg} flex items-center gap-1`}
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>{t.addTeam}</span>
+                    </button>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {(teams || [])
+                    .filter(tm => tm.sport === activeView)
+                    .filter(tm => selectedGroupFilter === 'all' || tm.group === selectedGroupFilter)
+                    .map(tm => (
+                      <div 
+                        key={tm.id} 
+                        onClick={() => setSelectedTeam(tm)}
+                        className={`p-5 rounded-2xl border cursor-pointer hover:border-emerald-500/60 transition-all shadow-sm ${
+                          isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <span className="text-3xl">{tm.logo}</span>
+                            <div>
+                              <h3 className="font-extrabold text-base hover:underline">{tm.name}</h3>
+                              <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${palette.badge}`}>
+                                {t[tm.group] || t[tm.sport]}
+                              </span>
+                            </div>
+                          </div>
+                          {isAdmin && (
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); handleDeleteTeam(tm.id); }} 
+                              className="text-rose-400 hover:bg-rose-500/20 p-1.5 rounded-lg"
+                              title="حذف الفريق"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-slate-800/60 text-xs text-slate-400 space-y-1">
+                          <p>👑 الكابتن: <span className="text-white font-medium">{tm.captain || '-'}</span></p>
+                          <p>🧤 حارس المرمى: <span className="text-white font-medium">{tm.gk || '-'}</span></p>
+                          <p className="text-emerald-400 font-bold pt-1">انقر لعرض القائمة وإدارة اللاعبين ←</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* SUB-TAB 5: TOP SCORERS & LEADERBOARDS */}
+            {sportSubTab === 'stats' && activeView === 'football' && (
+              <div className="space-y-8">
+                {/* Top Scorers */}
+                <div>
+                  <h3 className="text-lg font-black mb-4 flex items-center gap-2">
+                    <Award className={`w-5 h-5 ${palette.text}`} />
+                    <span>قائمة الهدافين (Top Scorers)</span>
+                  </h3>
+                  <div className={`rounded-2xl border overflow-x-auto ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                    {calculateTopScorers().length === 0 ? (
+                      <div className="p-6 text-center text-slate-400 text-sm">لا توجد أهداف مسجلة حتى الآن</div>
+                    ) : (
+                      <table className="w-full text-sm">
+                        <thead className={`text-xs uppercase border-b ${isDark ? 'bg-slate-950/60 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200'}`}>
+                          <tr>
+                            <th className="py-3 px-4 text-start">#</th>
+                            <th className="py-3 px-4 text-start">اسم اللاعب</th>
+                            <th className="py-3 px-4 text-start">الفريق</th>
+                            <th className="py-3 px-4 text-center">⚽ الأهداف</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/50">
+                          {calculateTopScorers().map((scorer, idx) => {
+                            const tm = teams.find(t => t.id === scorer.teamId) || { name: '-', logo: '⚽' };
+                            return (
+                              <tr key={idx} className="hover:bg-slate-800/20">
+                                <td className="py-3 px-4 font-bold">{idx + 1}</td>
+                                <td className="py-3 px-4 font-bold">{scorer.name}</td>
+                                <td className="py-3 px-4">{tm.logo} {tm.name}</td>
+                                <td className="py-3 px-4 text-center font-black text-emerald-400 text-base">{scorer.goals}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </div>
+
+                {/* Man of the Match Leaderboard */}
+                <div>
+                  <h3 className="text-lg font-black mb-4 flex items-center gap-2">
+                    <Trophy className={`w-5 h-5 text-amber-400`} />
+                    <span>نجوم الماتش (Man of the Match Leaderboard)</span>
+                  </h3>
+                  <div className={`rounded-2xl border overflow-x-auto ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                    {calculateManOfTheMatch().length === 0 ? (
+                      <div className="p-6 text-center text-slate-400 text-sm">لم يتم اختيار أي لاعب كرجل للمباراة بعد</div>
+                    ) : (
+                      <table className="w-full text-sm">
+                        <thead className={`text-xs uppercase border-b ${isDark ? 'bg-slate-950/60 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200'}`}>
+                          <tr>
+                            <th className="py-3 px-4 text-start">#</th>
+                            <th className="py-3 px-4 text-start">اسم اللاعب</th>
+                            <th className="py-3 px-4 text-start">الفريق</th>
+                            <th className="py-3 px-4 text-center">⭐ مرات الحصول على جائزة رجل المباراة</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/50">
+                          {calculateManOfTheMatch().map((mom, idx) => {
+                            const tm = teams.find(t => t.id === mom.teamId) || { name: '-', logo: '⚽' };
+                            return (
+                              <tr key={idx} className="hover:bg-slate-800/20">
+                                <td className="py-3 px-4 font-bold">{idx + 1}</td>
+                                <td className="py-3 px-4 font-bold">{mom.name}</td>
+                                <td className="py-3 px-4">{tm.logo} {tm.name}</td>
+                                <td className="py-3 px-4 text-center font-black text-amber-400 text-base">{mom.awards}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SUB-TAB 6: RULES */}
+            {sportSubTab === 'rules' && (
+              <div className={`p-6 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                <h3 className="font-bold text-lg mb-3">{t.rules} - {t[activeView]}</h3>
+                {isAdmin ? (
+                  <textarea
+                    rows={5}
+                    value={uiConfig?.rules?.[activeView] || ''}
+                    onChange={e =>
+                      setUiConfig(prev => ({
+                        ...prev,
+                        rules: { ...(prev?.rules || {}), [activeView]: e.target.value }
+                      }))
+                    }
+                    className={`w-full p-3 rounded-xl text-sm border ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300'}`}
+                  />
+                ) : (
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-slate-300">
+                    {uiConfig?.rules?.[activeView]}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* ==========================================
+          MODAL 1: TEAM PROFILE & ROSTER MODAL
+         ========================================== */}
+      {selectedTeam && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className={`w-full max-w-xl p-6 rounded-3xl border shadow-2xl space-y-6 ${
+            isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex items-center justify-between border-b pb-4 border-slate-800">
+              <div className="flex items-center gap-3">
+                <span className="text-4xl">{selectedTeam.logo}</span>
+                <div>
+                  <h3 className="text-2xl font-black">{selectedTeam.name}</h3>
+                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded ${palette.badge}`}>
+                    {t[selectedTeam.group] || t[selectedTeam.sport]}
+                  </span>
+                </div>
+              </div>
+              <button onClick={() => setSelectedTeam(null)} className="p-2 hover:bg-slate-800 rounded-full">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Captain & GK */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className={`p-4 rounded-2xl border relative ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                <p className="text-xs text-slate-400">👑 كابتن الفريق</p>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="font-extrabold text-sm text-amber-400 truncate">{selectedTeam.captain || 'غير محدد'}</p>
+                  {isAdmin && selectedTeam.captain && selectedTeam.captain !== 'غير محدد' && (
+                    <button 
+                      onClick={() => handleClearTeamRole(selectedTeam.id, 'captain')}
+                      className="text-rose-400 hover:bg-rose-500/20 p-1 rounded"
+                      title="حذف/إبدال الكابتن"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className={`p-4 rounded-2xl border relative ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                <p className="text-xs text-slate-400">🧤 حارس المرمى</p>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="font-extrabold text-sm text-cyan-400 truncate">{selectedTeam.gk || 'غير محدد'}</p>
+                  {isAdmin && selectedTeam.gk && selectedTeam.gk !== 'غير محدد' && (
+                    <button 
+                      onClick={() => handleClearTeamRole(selectedTeam.id, 'gk')}
+                      className="text-rose-400 hover:bg-rose-500/20 p-1 rounded"
+                      title="حذف/إبدال الحارس"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Players List with Delete Option */}
+            <div>
+              <h4 className="font-extrabold text-sm mb-3 flex items-center gap-2">
+                <Users className="w-4 h-4 text-emerald-400" />
+                <span>قائمة لاعبي الفريق ({(selectedTeam.players || []).length}):</span>
+              </h4>
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {(selectedTeam.players || []).length === 0 ? (
+                  <p className="text-xs text-slate-400">لا توجد أسماء لاعبين إضافيين مسجلين.</p>
+                ) : (
+                  (selectedTeam.players || []).map((pl, idx) => (
+                    <div key={idx} className={`p-3 rounded-xl border flex items-center justify-between text-sm font-medium ${
+                      isDark ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50 border-slate-200'
+                    }`}>
+                      <span>{idx + 1}. {pl}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">لاعب</span>
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDeletePlayer(selectedTeam.id, pl)}
+                            className="text-rose-400 hover:bg-rose-500/20 p-1.5 rounded-lg"
+                            title="حذف اللاعب من الفريق"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Admin Controls to Add Roster Member */}
+            {isAdmin && (
+              <div className={`p-4 rounded-2xl border space-y-3 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-300'}`}>
+                <p className="text-xs font-bold text-emerald-400">➕ إضافة عضو جديد أو لاعب للفريق:</p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    placeholder={t.playerName}
+                    value={newMemberName}
+                    onChange={e => setNewMemberName(e.target.value)}
+                    className={`flex-1 px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300'}`}
+                  />
+                  <select
+                    value={newMemberRole}
+                    onChange={e => setNewMemberRole(e.target.value)}
+                    className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300'}`}
+                  >
+                    <option value="player">لاعب عادي</option>
+                    <option value="captain">تعيين ككابتن الفريق</option>
+                    <option value="gk">تعيين كحارس مرمى</option>
+                  </select>
+                  <button
+                    onClick={() => handleAddRosterMember(selectedTeam.id)}
+                    className={`px-4 py-2 rounded-xl text-sm font-bold text-white ${palette.bg}`}
+                  >
+                    إضافة
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          MODAL 2: MATCH DETAIL & EVENT LOGGING MODAL WITH DROPDOWN ROSTER
+         ========================================== */}
+      {selectedMatch && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className={`w-full max-w-2xl p-6 rounded-3xl border shadow-2xl space-y-6 ${
+            isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex items-center justify-between border-b pb-4 border-slate-800">
+              <div>
+                <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${palette.badge}`}>
+                  {t[selectedMatch.group]} • {selectedMatch.date}
+                </span>
+                <h3 className="text-xl font-black mt-2">تفاصيل المباراة وسجل الأحداث (Match Center)</h3>
+              </div>
+              <button onClick={() => setSelectedMatch(null)} className="p-2 hover:bg-slate-800 rounded-full">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Scoreboard Preview */}
+            <div className="flex items-center justify-around p-6 rounded-2xl bg-slate-950 border border-slate-800">
+              <div className="text-center">
+                <span className="text-3xl">{getTeam(selectedMatch.homeTeamId).logo}</span>
+                <p className="font-black mt-1">{getTeam(selectedMatch.homeTeamId).name}</p>
+              </div>
+              <div className="text-3xl font-black px-6 py-2 rounded-xl bg-slate-900 text-emerald-400 border border-slate-800">
+                {selectedMatch.homeScore} : {selectedMatch.awayScore}
+              </div>
+              <div className="text-center">
+                <span className="text-3xl">{getTeam(selectedMatch.awayTeamId).logo}</span>
+                <p className="font-black mt-1">{getTeam(selectedMatch.awayTeamId).name}</p>
+              </div>
+            </div>
+
+            {/* Events Log List */}
+            <div>
+              <h4 className="font-extrabold text-sm mb-3">سجل أهداف وأحداث المباراة:</h4>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {matchEvents.filter(ev => ev.matchId === selectedMatch.id).length === 0 ? (
+                  <p className="text-xs text-slate-400 text-center py-2">لا توجد أهداف أو بطاقات مسجلة لهذه المباراة حتى الآن.</p>
+                ) : (
+                  matchEvents.filter(ev => ev.matchId === selectedMatch.id).map(ev => {
+                    const tm = getTeam(ev.teamId);
+                    return (
+                      <div key={ev.id} className={`p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold ${
+                        isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                      }`}>
+                        <div className="flex items-center gap-2">
+                          <span>{ev.type === 'goal' ? '⚽ هدف' : ev.type === 'yellow' ? '🟨 انذار أصفر' : ev.type === 'red' ? '🟥 طرد أحمر' : '⭐ رجل الماتش'}</span>
+                          <span>{ev.playerName}</span>
+                          <span className="text-slate-400">({tm.name})</span>
+                        </div>
+                        {isAdmin && (
+                          <button onClick={() => handleDeleteMatchEvent(ev.id)} className="text-rose-400 hover:bg-rose-500/20 p-1 rounded">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            {/* Admin Logging Form with Dropdown Players */}
+            {isAdmin && (
+              <div className={`p-4 rounded-2xl border space-y-3 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-300'}`}>
+                <p className="text-xs font-bold text-emerald-400">⚡ تسجيل هدف أو بطاقة باختيار اللاعب من القائمة:</p>
+                
+                {/* Team selection */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setLogTeamId(selectedMatch.homeTeamId);
+                      setLogPlayerName('');
+                    }}
+                    className={`flex-1 py-2 rounded-xl text-xs font-bold border transition ${
+                      logTeamId === selectedMatch.homeTeamId 
+                        ? `${palette.bg} text-white border-transparent` 
+                        : 'bg-slate-800 text-slate-300 border-slate-700'
+                    }`}
+                  >
+                    {getTeam(selectedMatch.homeTeamId).logo} {getTeam(selectedMatch.homeTeamId).name}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLogTeamId(selectedMatch.awayTeamId);
+                      setLogPlayerName('');
+                    }}
+                    className={`flex-1 py-2 rounded-xl text-xs font-bold border transition ${
+                      logTeamId === selectedMatch.awayTeamId 
+                        ? `${palette.bg} text-white border-transparent` 
+                        : 'bg-slate-800 text-slate-300 border-slate-700'
+                    }`}
+                  >
+                    {getTeam(selectedMatch.awayTeamId).logo} {getTeam(selectedMatch.awayTeamId).name}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {/* Player Dropdown from Team Roster */}
+                  <select
+                    value={logPlayerName}
+                    onChange={e => setLogPlayerName(e.target.value)}
+                    className={`px-3 py-2 rounded-xl text-xs border ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300'}`}
+                  >
+                    <option value="">-- اختر اللاعب من التشكيلة --</option>
+                    {getTeamRosterList(logTeamId || selectedMatch.homeTeamId).map((playerStr, idx) => (
+                      <option key={idx} value={playerStr}>{playerStr}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={logEventType}
+                    onChange={e => setLogEventType(e.target.value)}
+                    className={`px-3 py-2 rounded-xl text-xs border ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300'}`}
+                  >
+                    <option value="goal">⚽ تسجيل هدف (يزيد النتيجة تلقائياً)</option>
+                    <option value="yellow">🟨 إنذار أصفر</option>
+                    <option value="red">🟥 طرد أحمر</option>
+                    <option value="mom">⭐ رجل المباراة (Man of the Match)</option>
+                  </select>
+
+                  <button
+                    onClick={() => {
+                      if (!logPlayerName) return;
+                      handleLogMatchEvent(selectedMatch.id, logTeamId || selectedMatch.homeTeamId, logPlayerName, logEventType);
+                      setLogPlayerName('');
+                    }}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold text-white ${palette.bg}`}
+                  >
+                    إضافة الحدث
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          MODAL 3: ADMIN PASSWORD LOGIN
+         ========================================== */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <form
+            onSubmit={handleLoginSubmit}
+            className={`w-full max-w-md p-6 rounded-2xl border shadow-2xl ${
+              isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-extrabold flex items-center gap-2">
+                <Lock className={`w-5 h-5 ${palette.text}`} />
+                <span>{t.adminLogin}</span>
+              </h3>
+              <button type="button" onClick={() => setShowLoginModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <label className="block text-xs text-slate-400 mb-2">{t.passwordPrompt}</label>
+            <input
+              type="password"
+              autoFocus
+              value={passwordInput}
+              onChange={e => setPasswordInput(e.target.value)}
+              placeholder="••••••"
+              className={`w-full px-4 py-3 rounded-xl text-center tracking-widest text-lg font-bold border outline-none mb-3 ${
+                isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-100 border-slate-300 text-slate-900'
+              }`}
+            />
+
+            {loginError && (
+              <p className="text-xs text-rose-400 font-bold mb-3 text-center">{loginError}</p>
+            )}
+
+            <div className="flex gap-2 mt-4">
+              <button
+                type="submit"
+                className={`flex-1 py-2.5 rounded-xl font-bold text-sm text-white ${palette.bg} ${palette.hover}`}
+              >
+                {t.loginBtn}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowLoginModal(false)}
+                className="px-4 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300"
+              >
+                {t.cancelBtn}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* ==========================================
+          MODAL 4: ADMIN UI/UX CUSTOMIZATION STUDIO
+         ========================================== */}
+      {isAdmin && showUiModal && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className={`w-full max-w-lg p-6 rounded-2xl border shadow-2xl space-y-5 ${
+            isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-extrabold flex items-center gap-2">
+                <Palette className="w-5 h-5 text-amber-400" />
+                <span>{t.customizeUi}</span>
+              </h3>
+              <button onClick={() => setShowUiModal(false)}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold mb-2">{t.themeColor}</label>
+              <div className="flex gap-2">
+                {Object.keys(THEME_PALETTES).map(colorKey => (
+                  <button
+                    key={colorKey}
+                    onClick={() => setUiConfig(prev => ({ ...prev, theme: colorKey }))}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize border ${
+                      uiConfig?.theme === colorKey ? 'border-white ring-2 ring-white/40' : 'border-transparent opacity-75'
+                    } ${THEME_PALETTES[colorKey].bg} text-white`}
+                  >
+                    {colorKey}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setUiConfig(prev => ({ ...prev, darkMode: !prev.darkMode }))}
+                className="p-3 rounded-xl border border-slate-700 flex items-center justify-center gap-2 text-xs font-bold"
+              >
+                {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-blue-400" />}
+                <span>{t.darkMode}</span>
+              </button>
+              <button
+                onClick={() => setUiConfig(prev => ({ ...prev, gridCols: prev.gridCols === 2 ? 4 : 2 }))}
+                className="p-3 rounded-xl border border-slate-700 text-xs font-bold"
+              >
+                {t.gridCols}: {uiConfig?.gridCols || 4} Columns
+              </button>
+            </div>
+
+            <div className="flex justify-between pt-3 border-t border-slate-800">
+              <button
+                onClick={handleResetZeroData}
+                className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-500/20 text-rose-400 flex items-center gap-1"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>{t.seedData}</span>
+              </button>
+              <button
+                onClick={() => setShowUiModal(false)}
+                className={`px-5 py-2 rounded-xl text-xs font-bold text-white ${palette.bg}`}
+              >
+                {t.save}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          MODAL 5: PWA & DEPLOYMENT FILES (PASSWORD HIDDEN)
+         ========================================== */}
+      {isAdmin && showPwaModal && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className={`w-full max-w-2xl p-6 rounded-2xl border shadow-2xl space-y-4 ${
+            isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-extrabold flex items-center gap-2">
+                <Smartphone className="w-5 h-5 text-cyan-400" />
+                <span>{t.pwaSetup}</span>
+              </h3>
+              <button onClick={() => setShowPwaModal(false)}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-400">
+              لتثبيت التطبيق كتطبيق مستقل (PWA) على الموبايل ومشاركته برابط مباشر لطلاب مدرسة STEM Behera، ضع ملف <code>manifest.json</code> في مجلد <code>public/</code> وارفع المشروع على Netlify Drop أو Vercel. (تم حماية وتشفير كلمة مرور الأدمن بالكامل).
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
